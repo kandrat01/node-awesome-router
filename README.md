@@ -12,7 +12,7 @@ nmp i -S node-awesome-router
 ### Creating server
 ```js
 const http = require('http')
-const app = require('express')
+const app = require('express')()
 const NodeAwesomeRouter = require('node-awesome-router')
 
 ```
