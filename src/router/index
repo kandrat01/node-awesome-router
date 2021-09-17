@@ -24,24 +24,8 @@ const Router = {
       app.use(middleware)
     })
   },
-//   checkAccess (req, accessLevel) {
-//     if (!req._entity) {
-//       return false
-//     }
-//     if (!req._entity.id || !req._entity.type) {
-//       return false
-//     }
-//     if (accessLevel instanceof Array) {
-//       return accessLevel.includes(req._entity.type)
-//     }
-//     if (req._entity.type !== accessLevel) {
-//       return false
-//     }
-//     return true
-//   },
   setupRoutes (app) {
     this.routes.map(async route => {
-      console.log(route.key)
       const key = route.key
       const routes = route.routes
       const expressRouter = express.Router()
@@ -54,7 +38,6 @@ const Router = {
             try {
               const validated = this.validate(req.body, options.schema, req)
               if (validated !== true) {
-                console.log('not valiidated', req.body, options.schema)
                 const reply = new Reply(400, (['Validation error: '].concat(validated.map(err => err.message))).join('\n'))
                 return res.status(400).send(reply)
               }

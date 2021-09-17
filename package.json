@@ -1,6 +1,6 @@
 {
   "name": "node-awesome-router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Developer-Friendly router for nodejs server based on ExpressRouter",
   "main": "index.js",
   "scripts": {
