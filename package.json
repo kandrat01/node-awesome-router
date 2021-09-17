@@ -1,0 +1,30 @@
+{
+  "name": "node-awesome-router",
+  "version": "1.0.0",
+  "description": "Developer-Friendly router for nodejs server based on ExpressRouter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kandrat01/node-awesome-router.git"
+  },
+  "keywords": [
+    "router",
+    "express",
+    "node",
+    "validator-router"
+  ],
+  "author": "zdergmann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kandrat01/node-awesome-router/issues"
+  },
+  "homepage": "https://github.com/kandrat01/node-awesome-router#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-subdomain": "^1.0.5",
+    "fastest-validator": "^1.11.1"
+  }
+}

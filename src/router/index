@@ -1,0 +1,88 @@
+const path = require('path')
+const Reply = require('./../reply/index')
+const subdomain = require('express-subdomain')
+const FastestValidator = require('fastest-validator')
+const express = require('express')
+
+const Validator = new FastestValidator({
+  useNewCustomCheckerFunction: true
+})
+
+const Router = {
+  globalMiddleWares: [], 
+  routes: [], 
+  async handle (app) {
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
+    await this.setupMiddlewares(app)
+    this.setupRoutes(app)
+    app.get('*', (req, res) => {
+    })
+  },
+  async setupMiddlewares (app) {
+    this.globalMiddleWares.map(async middleware => {
+      app.use(middleware)
+    })
+  },
+//   checkAccess (req, accessLevel) {
+//     if (!req._entity) {
+//       return false
+//     }
+//     if (!req._entity.id || !req._entity.type) {
+//       return false
+//     }
+//     if (accessLevel instanceof Array) {
+//       return accessLevel.includes(req._entity.type)
+//     }
+//     if (req._entity.type !== accessLevel) {
+//       return false
+//     }
+//     return true
+//   },
+  setupRoutes (app) {
+    this.routes.map(async route => {
+      console.log(route.key)
+      const key = route.key
+      const routes = route.routes
+      const expressRouter = express.Router()
+      for (const itemRoute in routes) {
+        const options = routes[itemRoute]()
+        const middleWares = options.middleWares || []
+        expressRouter[options.method](itemRoute, ...middleWares, (req, res) => {
+          if (options.schema) {
+            // need to validate
+            try {
+              const validated = this.validate(req.body, options.schema, req)
+              if (validated !== true) {
+                console.log('not valiidated', req.body, options.schema)
+                const reply = new Reply(400, (['Validation error: '].concat(validated.map(err => err.message))).join('\n'))
+                return res.status(400).send(reply)
+              }
+            } catch (err) {
+              console.log(err, req.body, options.schema)
+              return res.status(500).send(new Reply(500, 'Could not validate req.body'))
+            }
+          }
+
+          return options.handler(req, res)
+        })
+      }
+      if (route.subdomain) {
+        // this means we need some subdomain route
+        app.use(key, subdomain(route.subdomain, expressRouter))
+      } else {
+        app.use(key, expressRouter)
+      }
+    })
+  },
+  validate (params, schema, req) {
+    Validator._req = req
+    return Validator.validate(params, schema, req)
+  }
+}
+
+module.exports = ({app, routes, middleWares}) => {
+    Router.globalMiddleWares = middleWares || []
+    Router.routes  = routes || []
+    return Router.handle(app)
+}
