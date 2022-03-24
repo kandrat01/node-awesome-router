@@ -6,7 +6,7 @@
 # Developer-Friendly router for Nodejs servers
 ## install
 ```js
-nmp i -S node-awesome-router
+npm i -S node-awesome-router
 ```
 ## Usage
 ### Creating server
