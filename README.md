@@ -95,9 +95,10 @@ httpServer.listen(8080, () => {
 
 ```
 <hr/>
+
 | Syntax | Description |
 | --- | ----------- |
-| app | Expressjs instance |
+| app | [ExpressJS](https://expressjs.com/) instance |
 | routes | array of routes |
 | middleWares | array of middleware functions |
 | on404 | 404 not found handler function |
