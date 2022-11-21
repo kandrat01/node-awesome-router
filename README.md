@@ -5,7 +5,7 @@
 
 # Developer-Friendly router for Nodejs servers
 ## install
-```js
+```bash
 npm i -S node-awesome-router
 ```
 ## Usage
@@ -19,7 +19,7 @@ const NodeAwesomeRouter = require('node-awesome-router')
 ### Creating route
 ```js
 // POST -> DEV.site.com/myPath/authorize
-const routesPart1 = {
+const routesGroup1 = {
   key: '/myPath',
   routes: {
     '/authorize' () {
@@ -30,9 +30,8 @@ const routesPart1 = {
           password: { type: 'string', min: 4, max: 20 },
         },
         middleWares: [
-          (req, res, next) => { console.log('auth attempt');}, 
-          (req, res, next) => { console.log('auth attempt');}, 
-          ...
+          (req, res, next) => { console.log('log1'); next();}, 
+          (req, res, next) => { console.log('log2'); next();},
         ],
         async handler (req, res) {
           // your logic here
@@ -47,28 +46,27 @@ const routesPart1 = {
 ### Another route
 ```js
 // GET ->  USERS.site.com/user/info/1
-const routesPart2 = {
+const routesGroup2 = {
   key: '/user', 
   routes: {
     '/info/:id?' () {
-    return {
-      method: 'get',
-      middleWares: [
-      (req, res, next) => { console.log('auth attempt');}, 
-      (req, res, next) => { console.log('auth attempt');}, 
-      ...
-      ],
-      async handler (req, res) {
-        // your logic here
-        return res.status(200).send('welcome')
-      }   
-    }
-  }
+        return {
+          method: 'get',
+          middleWares: [
+          (req, res, next) => { console.log('auth attempt'); next()}, 
+          ],
+          async handler (req, res) {
+            // your logic here
+            return res.status(200).send('welcome')
+          }   
+        }
+      }
   }, 
   subdomain: 'users' 
 }
 
 ```
+
 ### Global middlewares
 ```js
 const globalMiddleWare = (req, res, next) => {
@@ -82,8 +80,13 @@ const httpServer = http.createServer(app)
 
 NodeAwesomeRouter({
   app,
-  routes: [routesPart1, routesPart2, ],
-  middlewares: [globalMiddleWare, ]
+  routes: [routesGroup1, routesGroup2, ],
+  middleWares: [globalMiddleWare, ],
+  on404 (req, res) {
+    return res.send('...')
+  }
+  
+  
 })
 
 httpServer.listen(8080, () => {
@@ -92,6 +95,13 @@ httpServer.listen(8080, () => {
 
 ```
 <hr/>
+| Syntax | Description |
+| --- | ----------- |
+| app | Expressjs instance |
+| routes | array of routes |
+| middleWares | array of middleware functions |
+| on404 | 404 not found handler function |
+
 
 ## Details for validation schema syntax can be found here 
 [fastest-validator](https://www.npmjs.com/package/fastest-validator)

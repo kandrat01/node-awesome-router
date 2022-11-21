@@ -1,4 +1,3 @@
-const path = require('path')
 const Reply = require('./../reply/index')
 const subdomain = require('express-subdomain')
 const FastestValidator = require('fastest-validator')
@@ -11,12 +10,19 @@ const Validator = new FastestValidator({
 const Router = {
   globalMiddleWares: [], 
   routes: [], 
+  def404 (req, res) {
+    return res.status(404).send('default 404');
+  },
   async handle (app) {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
     await this.setupMiddlewares(app)
     this.setupRoutes(app)
     app.get('*', (req, res) => {
+      if(typeof this.on404 === 'function') {
+         return this.on404(req, res)
+      }
+      return this.def404(req, res)
     })
   },
   async setupMiddlewares (app) {
@@ -64,8 +70,11 @@ const Router = {
   }
 }
 
-module.exports = ({app, routes, middleWares}) => {
-    Router.globalMiddleWares = middleWares || []
-    Router.routes  = routes || []
-    return Router.handle(app)
+module.exports = ({app, routes, middleWares, on404}) => {
+  Router.globalMiddleWares = middleWares || []
+  Router.routes  = routes || []
+  if(typeof on404 === 'function') {
+    Router.on404 = on404
+  }
+  return Router.handle(app)
 }
